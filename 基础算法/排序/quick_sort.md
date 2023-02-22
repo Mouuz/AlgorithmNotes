@@ -1,3 +1,4 @@
+```C++
 #include <iostream>
 #include <vector>
 
@@ -15,8 +16,9 @@ void Quick_sort(vector<int> & array,  int l, int r)
         if(i < j) swap(array[i], array[j]);
     }
 
-    Quick_sort(array, l, j);
-    Quick_sort(array, j + 1, r);
+Quick_sort(array, l, j);
+Quick_sort(array, j + 1, r);
+
 }
 
 
@@ -34,3 +36,6 @@ int main()
     }
     return 0;
 }
+```
+
+

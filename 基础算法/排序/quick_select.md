@@ -1,3 +1,4 @@
+```C++
 //快速选择算法
 //整体思路和快速排序相同，只是在递归部分做选择判断
 int quicksort(vector<int>& arr, int l, int r, int k) {
@@ -18,3 +19,5 @@ int quicksort(vector<int>& arr, int l, int r, int k) {
         return quicksort(arr, l, j, k);
     return quicksort(arr, j + 1, r, k - sl);
 }
+```
+

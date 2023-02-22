@@ -1,3 +1,4 @@
+```C++
 using std::vector;
 using std::cout;
 using std::endl;
@@ -12,17 +13,17 @@ void Merge_sort(vector<int> & arr, int l, int r)
     Merge_sort(arr, l, mid);
     Merge_sort(arr, mid + 1, r);
 
-    int i = l, j = mid + 1, k = 0;
-    while(i <= mid && j <= r){
-        if(arr[i] < arr[j]) temp[k++] = arr[i++];
-        else temp[k++] = arr[j++];
-    }
-    while(i <= mid) temp[k++] = arr[i++];
-    while(j <= r) temp[k++] = arr[j++];
-
-    for(i = l, j = 0; i <= r; ++i, ++j) arr[i] = temp[j]
+int i = l, j = mid + 1, k = 0;
+while(i <= mid && j <= r){
+    if(arr[i] < arr[j]) temp[k++] = arr[i++];
+    else temp[k++] = arr[j++];
 }
+while(i <= mid) temp[k++] = arr[i++];
+while(j <= r) temp[k++] = arr[j++];
 
+for(i = l, j = 0; i <= r; ++i, ++j) arr[i] = temp[j]
+
+}
 
 int main()
 {
@@ -38,3 +39,5 @@ int main()
     }
     return 0;
 }
+```
+
