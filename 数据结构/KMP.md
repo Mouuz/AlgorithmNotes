@@ -43,7 +43,7 @@
 
 ### 那么为什么要找最长的公共前后缀呢？通过下图分析：
 
-![image-20230302225033861](C:\Users\24298\AppData\Roaming\Typora\typora-user-images\image-20230302225033861.png)
+![](KMP.png)
 
 
 
