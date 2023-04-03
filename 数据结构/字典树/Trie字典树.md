@@ -11,6 +11,8 @@
 ## 示例代码
 
 ```C++
+题目： 输入N个字符串，求某个字符串出现次数 	
+
 #include <iostream>
 using namespace std;
 const int N = 100010
@@ -72,5 +74,63 @@ idx可以理解为计划生育的管理局的给上户口的，生一个孩子�
 
 
 
+```c++
+题目：N个数中任取2个数进行异或运算，求最大异或值。
+    
+#include<iostream>
+#include<algorithm>
 
+using namespace std;
+
+const int N = 100010, M = 31 * N;
+
+int a[N], son[M][2], idx;
+
+void insert(int x) //建树
+{
+    int p = 0;
+    for(int i = 30; ~i; --i) 
+    {   //对x的二进制串从高到低放入树中
+        if(!son[p][x>>i&1])  
+            son[p][x>>i&1] = ++idx;
+        p = son[p][x>>i&1];
+    }
+}
+
+int query(int x)
+{
+    int p = 0, res = 0;
+    for(int i = 30; ~i; --i)
+    {
+        int t = x>>i&1;
+        if(son[p][!t]) //判断x的第i位"!t"是否存在，若存在则向"!t"方向走
+        {
+            res += 1 << i; //此时结果的第i位则可以取1
+            p = son[p][!t];
+        }else
+        {
+            p = son[p][t]; //此时结果的第i位则只能取0,故省略 
+        }
+    }
+    return res;
+}
+
+int main()
+{
+    int n, x, res = 0;
+    cin >> n;
+    for(int i = 0; i < n; ++i)
+    {
+        cin >> a[i];
+        insert(a[i]);
+    }
+    
+    for(int i = 0; i <n; ++i)
+    {
+        res = max(res, query(a[i]));
+    }
+    cout << res;
+    return 0;
+}
+```
 

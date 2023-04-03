@@ -41,14 +41,65 @@
 
 
 
-### 那么为什么要找最长的公共前后缀呢？通过下图分析：
+### 1.为什么要找最长的公共前后缀呢？通过下图分析：
 
 ![](KMP.png)
 
 
 
-2.明确了这一点再研究如何求的**P**串的**next**数组
+### 2.明确了这一点再研究如何求的**P**串的**next**数组
 
 ​	现在要求next[i]的值，假设已经求得了next[i-1]的值，此时我们只需判断 **p[ i ]** 是否等于 **p[ j + 1 ]**,若等于，则
 
- **next[ i - 1 ] = next[ i ] + 1**,若不等于，则让 **j = next[ j ]**，也就是让
+ **next[ i - 1 ] = next[ i ] + 1**,若不等于，则让 **j = next[ j ]**，也就是让 **j** 移动至与之匹配的前缀处，再次进行匹配判断。重复此过程
+
+可求得对于 **P**串中每一串以 **P[i]**结尾的字符串的最大公共前后缀长度。
+
+
+
+### 3.Code
+
+```c++
+//ex input:
+3 
+abc
+5
+abcabc
+
+//output
+0 2
+ 
+#include<iostream>
+#include<string>
+
+using namespace std;
+const int N = 100010;
+const int M = 1000010;
+char p[N], s[M];
+int ne[N];
+
+int main()
+{
+    int n,m;
+    cin >> n >> p + 1 >> m >> s + 1;
+    
+    for(int i = 2, j = 0; i <= n; ++i)
+    {
+        while(j && p[i] != p[j + 1]) j = ne[j];
+        if(p[i] == p[j + 1]) j++;
+        ne[i] = j;
+    }
+    
+    
+    for(int i = 1, j = 0; i <= m; ++ i)
+    {
+        while(j && s[i] != p[j + 1] ) j = ne[j];
+        if(s[i] == p[j + 1]) j++;
+        if(j == n){
+            printf("%d ", i - n);
+        }
+    }
+    return 0;
+}
+```
+
