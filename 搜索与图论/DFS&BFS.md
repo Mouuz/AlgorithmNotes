@@ -122,7 +122,7 @@ int main()
 4. 将这些相邻节点放入队列尾部。
 5. 重复步骤3和步骤4直到队列为空。
 
-### 示例
+### 示例1
 
 走迷宫https://www.acwing.com/problem/content/846/
 
@@ -184,4 +184,80 @@ int main()
 ```
 
 
+
+### 示例2
+
+八数码https://www.acwing.com/problem/content/847/
+
+```C++
+#include <iostream>
+#include <algorithm>
+#include <unordered_map>
+#include <queue>
+
+//这题巧妙的使用字符串来表示节点状态，方便了后续一系列操作
+//使用哈希表来存储每个节点状态（字符串）相对应的距离值
+
+using namespace std;
+
+int bfs(string start)
+{
+    string end = "12345678x";       //定义终点目标状态
+    
+    queue<string> q;                
+    unordered_map<string, int> d;   //存储每种状态所对应的距离值
+    
+    q.push(start);                  //初始状态放入队列中
+    d[start] = 0;                   //初始状态距离初始状态的距离值为0
+    
+    while(q.size())
+    {
+        auto t = q.front();
+        q.pop();
+        
+        int distance = d[t];
+        
+        //如果当前从队列中取出的状态和目标状态相同表明走到了终点，返回此时对应的距离值
+        if(t == end) return distance;   
+        
+        int k = t.find('x');                        //找到'x'在一维字符串中的坐标
+        int x = k / 3, y = k % 3;                   //转化为在矩阵中的(x,y)坐标
+        int dx[4] = {0,-1,0,1}, dy[4] = {-1,0,1,0};
+        for(int i = 0; i < 4; ++i)                  //向上下左右四个方向依次移动
+        {
+            int a = x + dx[i], b = y + dy[i];           
+            if(a >= 0 && a < 3 && b >= 0 && b < 3)  //检查移动后的坐标在矩阵中是否合法未出界
+            {
+                swap(t[k], t[a * 3 + b]);           //合法的话就交换'x'和向某个方向移动后的坐标值
+                                                    //二维坐标转换一维坐标  x * m(列的大小) + y
+                
+                //交换后形成新的字符串,若果该新字符串未被遍历过则放入队列中,同时更新该新字符串距原状态的距离值
+                if(d.find(t) == d.end())            
+                {
+                    q.push(t);
+                    d[t] = distance + 1;
+                }
+                
+                //还原未移动时的状态,因为是以某个点为原点向四个方向移动,那么在向任意方向移动后需要退回原点，再向剩余未移动的方向进行尝试,才能保证正确性
+                swap(t[k], t[a * 3 + b]);           
+            }
+        }
+    }
+    return -1;
+}
+
+int main()
+{
+    string state;
+    for(int i = 0; i < 9; ++i)
+    {
+        char c;
+        cin >> c;
+        state += c;
+    }
+    
+    cout << bfs(state) << endl;
+    return 0;
+}
+```
 
