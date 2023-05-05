@@ -8,12 +8,14 @@
 
 (2) 邻接表：
 
+​	邻接表不用管执行顺序，只需要知道每个节点能够访问的所有结点就行，链表内的顺序并不重要
+
 ```C++
 // 对于每个点i，开一个单链表，存储i所有可以走到的点。
-int h[N],  	 //h[i]存储这个单链表的头结点的下标
-	e[N],	//表示
-	ne[N],
-	idx;
+int h[N],  	 //h[i]存储是 i的所有邻点组成的单链表的头结点。
+	e[N],	//i是边编号，e[i]的值是i这条边终点的结点编号
+	ne[N],	//i是边编号，ne[i]的值是i这条边同一起点的下一条边的编号
+	idx;	//边的编号
 
 // 添加一条边a->b
 void add(int a, int b)
@@ -39,12 +41,72 @@ void dfs(int u)
 
     for (int i = h[u]; i != -1; i = ne[i]) //dfs以u为根节点的所有子树
     {
-        int j = e[i];	//
-        if (!check[j])  //
+        int j = e[i];	
+        if (!check[j]) 
         {
             dfs(j);
         }
     }
+}
+```
+
+
+
+## 示例题   ☆☆☆重点☆☆☆
+
+树的重心https://www.acwing.com/problem/content/848/
+
+```C++
+#include <iostream>
+#include <algorithm>
+#include <cstring>
+
+using namespace std;
+
+const int N = 100010, M = N * 2; //注意这里是无向图， 边的数量为点的两倍
+
+int head[N], e[M], ne[M], idx;
+bool check[N];
+
+int n , ans = N;
+
+void add(int a, int b){
+    e[idx] = b;
+    ne[idx] = head[a];
+    head[a] = idx++;
+}
+
+int dfs(int u)
+{
+    check[u] = true;
+    int sum = 1, res = 0;
+    for(int i = head[u]; ~i; i = ne[i])
+    {
+        int j = e[i];
+        if(!check[j])
+        {
+            int s = dfs(j);
+            sum += s;
+            res = max(res, s);
+        }
+    }
+    res = max(res, n - sum);
+    ans = min(ans, res);
+    return sum;
+}
+
+int main()
+{
+    cin >> n;
+    memset(head, -1, sizeof head);
+    for(int i = 0; i < n - 1; ++i)
+    {
+        int a,b;
+        cin >> a >> b;
+        add(a,b), add(b,a);
+    }
+    dfs(1);
+    cout << ans << endl;
 }
 ```
 
