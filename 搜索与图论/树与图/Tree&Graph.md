@@ -30,7 +30,7 @@ memset(h, -1, sizeof h);
 
 
 
-## 树的DFS遍历
+## 树与图的DFS遍历   O(m+n)  n:节点数   m:边数
 
 ```C++
 bool check[N];    //标记数组，用于标记已经访问过的节点
@@ -107,6 +107,65 @@ int main()
     }
     dfs(1);
     cout << ans << endl;
+}
+```
+
+
+
+
+
+## 树与图的DFS遍历  O(m+n)
+
+```C++
+queue<int> q;
+check[1] = true; // 表示1号点已经被遍历过
+q.push(1);
+
+while (q.size())
+{
+    int t = q.front();
+    q.pop();
+
+    for (int i = h[t]; i != -1; i = ne[i])
+    {
+        int j = e[i];
+        if (!st[j])
+        {
+            check[j] = true; // 表示点j已经被遍历过
+            q.push(j);
+        }
+    }
+}
+```
+
+
+
+## 拓扑排序   O(n+m)
+
+```C++
+bool topsort()
+{
+    int hh = 0, tt = -1;
+
+    // d[i] 存储点i的入度值
+    for (int i = 1; i <= n; i ++ )
+        if (!d[i])
+            q[ ++ tt] = i;
+
+    while (hh <= tt)
+    {
+        int t = q[hh ++ ];
+
+        for (int i = h[t]; i != -1; i = ne[i])
+        {
+            int j = e[i];
+            if (-- d[j] == 0)
+                q[ ++ tt] = j;
+        }
+    }
+
+    // 如果所有点都入队了，说明存在拓扑序列；否则不存在拓扑序列。
+    return tt == n - 1;
 }
 ```
 
