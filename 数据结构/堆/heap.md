@@ -78,7 +78,7 @@ const int N = 100010;
 
 int heap[N], Size;
 
-void down(int idx)    // 核心操作上调
+void down(int idx)    // 核心操作下调
 {
     int t = idx;
     if(2 * idx <= Size && heap[2 * idx] < heap[t]) t = 2 * idx;
@@ -97,23 +97,6 @@ void up(int idx)       //核心操作上调
         swap(heap[idx], heap[idx / 2]);
         idx >> 1;
     }
-}
-
-int main()
-{
-    int m,n;
-    scanf("%d%d", &n, &m);
-    Size = n;
-    for(int i = 1; i <= n; ++i)
-        scanf("%d", &heap[i]);
-    for(int i = n/2; i; i--) down(i);
-    while(m--)
-    {
-        printf("%d ", heap[1]);
-        heap[1] = heap[Size--];
-        down(1);
-    }
-    return 0;
 }
 ```
 
