@@ -1,16 +1,22 @@
 
 
-<img src="D:\ac-win\搜索与图论\最短路问题\最短路问题.png" alt="最短路问题"/>
+<img src=".\最短路问题.png" alt="最短路问题"/>
 
-## 朴素Dijkstra算法
+## 朴素Dijkstra算法  主要用于稠密图
 
-​	思路：
+​	思路： 
 
 1. 定义一个最短距离数组`dist`，用于记录从起点到每个顶点的距离，初值为无穷大。
 2. 选择一个起点，将起点的距离设为0，加入已访问集合。
 3. 对于起点可直接到达的所有顶点，更新它们的距离，如果新的距离比原来的距离更小，则更新`dist[v]`的值。
 4. 在所有未访问的顶点中，找到距离起点距离最小的顶点，加入已访问集合。
 5. 重复步骤3和步骤4，直到所有顶点都被访问过。
+
+### 时间复杂度：
+
+ 查找距离最近且未确定最短距离的顶点：O(n²)
+
+
 
 ### 模板:
 
@@ -33,7 +39,7 @@ int dijkstra(){
     //可以这么理解，每次循环都会确定一个最小值，还会再创造一个最小值（留给下一次循环去确定）
     //当循环n-1次时，情况是已经确定了n-1个点的最小值了，还创造了一个最小值(此时还有1个点等着下一次去确定)
     //那么就不需要下一次循环了，毕竟剩下的就一个点，在1个点的集合中知道有一个点是最小值，顺理成章了
-    //当然你想写成for(int i=0;i<n;i++)也能AC~~小声说~~
+    //当然你想写成for(int i=0;i<n;i++)也能AC
         int t=-1;	//t就是要找的距离最近且未在st中点的下标，这里初始为-1方便后续比较无特殊意义
         for(int j=1;j<=n;j++){
             if(!st[j] && (t==-1 || dist[t]>dist[j])){
@@ -74,12 +80,90 @@ int main(){
 
 
 
-## 堆优化Dijkstra算法
+## 堆优化Dijkstra算法      主要用于稀疏图
 
 思路：
 	由于朴素Dij算法中的第4部反应在代码中是：每次从头到尾遍历Dist数组来找出距离起点最近的顶点，复杂度为O(n)。该操作非常的耗时。由于只是每次取出距离最短的（权重最小）点，此时考虑小根堆来存储，即可用O(1)完成此操作。
 
+### 时间复杂度：
+
+
+
+### 模板
+
 ```C++
-#include
+#include <iostream>
+#include <cstring>
+#include <algorithm>
+#include <queue>
+
+const int N = 1e6+10;
+
+using namespace std;
+using PII = pair<int, int>;
+
+int n,m;
+int head[N], e[N], w[N], ne[N], idx;	//邻接表存稀疏图
+int dist[N];							
+bool status[N];
+
+void add(int a, int b, int c)			//c 为 a->b 的边的权重
+{
+    e[idx] = b;
+    w[idx] = c;
+    ne[idx] = head[a];
+    head[a] = idx++;
+}
+
+int dijkstra()
+{
+    memset(dist, 0x3f, sizeof dist);
+    priority_queue<PII, vector<PII>, greater<PII> > heap;  //定义一个小根堆
+    
+    heap.push({0, 1});  // first表示起点到当前点的距离  second表示当前点的编号， 源点加入堆中
+    dist[1] = 0;	    // 初始化源点到自己的距离为 0
+    
+    while(heap.size())
+    {
+        auto t = heap.top();  // 拿到距离最近且未确认最小距离的点
+        
+        heap.pop();
+        
+        int ver = t.second, distance = t.first;
+        
+        if(status[ver]) continue;	//由于存在重边，会存在重复判断，此操作可以省去判断已确认了最短距离的点
+        status[ver] = true;			//当前点加入确认最小距离集合
+        
+        for(int i = head[ver]; ~i; i = ne[i])	//用当前点跟新所有能到达的点距源点的距离
+        {
+            int j = e[i];
+            if(dist[j] > distance + w[i])
+            {
+                dist[j] = distance + w[i];
+                heap.push({dist[j], j});		//
+            }
+        }
+    }
+    
+    if(dist[n] == 0x3f3f3f3f) return -1;
+    return dist[n];
+}
+
+
+int main()
+{
+    cin >> n >> m;
+    memset(head, -1, sizeof head);
+    while(m--)
+    {
+        int a,b,c;
+        cin >> a >> b >> c;
+        add(a, b, c);
+    }
+    
+    cout << dijkstra() << endl;
+    
+    return 0;
+}
 ```
 
