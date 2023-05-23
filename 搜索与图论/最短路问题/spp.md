@@ -175,7 +175,7 @@ int main()
 
 
 
-## Bellman-Ford算法 用于带负权的图
+## Bellman-Ford算法 用于带负权或是有负环的图
 
 思路：
 
@@ -187,7 +187,184 @@ int main()
 
 模板代码：
 
+```c++
+//通用模板，只求到点n的最短路
+
+//n:点数  m:边数
+int n, m;
+
+//dist[i] 存储 起点->点i 的最短距离
+int  dist[N];
+
+//bellman每轮要遍历所有边，所以任意存储方式都可,这里采用最简单的存边方式
+struct Edge{			
+    // 点a 指向 点b 的边权重为 w
+    int a, b, w;
+}
+
+// 求1到n的最短路距离，如果无法从1走到n，则返回-1。
+int bellman_ford()
+{
+    //初始化
+    memset(dist, 0x3f, sizeof dist);
+    dist[1] = 0;
+
+    // 如果第n次迭代仍然会松弛三角不等式，就说明存在一条长度是n+1的最短路径，由抽屉原理，路径中至少存在两个相同的点，说明图中存在负权回路。
+    for (int i = 0; i < n; i ++ )
+    {
+        for (int j = 0; j < m; j ++ )
+        {
+            int a = edges[j].a, b = edges[j].b, w = edges[j].w;
+            if (dist[b] > dist[a] + w)
+            {	
+                dist[b] = dist[a] + w;
+             
+                if(i == n - 1)
+                {
+                    cout << "有负权回路" << endl;
+                }
+            }
+        }
+    }
+    
+    //除特殊说明,否则在mian中做值判断更为保险 if(dist[n] > 0x3f3f3f3f / 2)  bellman中 正无穷值会改变，判断		时用同一数量级数即可
+    return dist[n];
+}
+
+
+//当限定最多通过 k 条边到达点 n 的最短路径时
+....
+int backup[N];   //定义备份数组
+...
+    
+     for (int i = 0; i < n; i ++ )
+    {
+     //在每轮松弛所有边前保存上一轮松弛完的状态，在接下来的松弛操作中始终通过原始状态判断，避免了
+     //在松弛操作单次循环内部发生状态改变后，其改变后的状态传递到下一轮循环中，影响最终结果。也就是
+     //避免了串联的情况发生
+        memcpy(backup, dist, sizeof dist); 
+        
+        for (int j = 0; j < m; j ++ )
+        {
+            int a = edges[j].a, b = edges[j].b, w = edges[j].w;
+            if (dist[b] > backup[a] + w)
+            {	
+                dist[b] = backup[a] + w;
+                if(i == n - 1)
+                {
+                    cout << "有负权回路" << endl;
+                    return ...;
+                }
+            }
+        }
+    }
+
+....
+      
 ```
-#include <iostream>
+
+
+
+
+
+## SPFA  对bellman算法的优化，避免了对所有边的遍历
+
+思路：
+
+引用BFS思想，当队列不为空一直循环，每轮将路径值改变的点放入队列中，因为只有某点的值改变，其出度的所有点的值才可能会发生改变。避免了bellman中每轮对所有边的遍历。
+
+复杂度:
+
+一般：O(m)  最坏: O(nm)
+
+```C++
+const int N = ...;  //依题意
+int n;      // 总点数
+int h[N], w[N], e[N], ne[N], idx;       // 邻接表存储所有边
+int dist[N];        // 存储每个点到1号点的最短距离
+bool st[N];     // 存储每个点是否在队列中
+
+// 求1号点到n号点的最短路距离，如果从1号点无法走到n号点则输出impossible
+int spfa()
+{
+    memset(dist, 0x3f, sizeof dist);
+    dist[1] = 0;
+
+    queue<int> q;
+    q.push(1);
+    st[1] = true;
+
+    while (q.size())
+    {
+        auto t = q.front();
+        q.pop();
+
+        st[t] = false;	//取出后取消标记
+
+        for (int i = h[t]; i != -1; i = ne[i])
+        {
+            int j = e[i];
+            if (dist[j] > dist[t] + w[i])
+            {
+                dist[j] = dist[t] + w[i];
+                if (!st[j])     // 如果队列中已存在j，则不需要将j重复插入
+                {
+                    q.push(j);
+                    st[j] = true;	//加入队列后，打上标记
+                }
+            }
+        }
+    }
+
+    
+   	// 这句留在 mian函数中判断更为保险 if (dist[n] == 0x3f3f3f3f) ....;
+    return dist[n];
+}
+
+//判断负环回路版本
+const int N = ...;  //依题意
+int n;      // 总点数
+int h[N], w[N], e[N], ne[N], idx;       // 邻接表存储所有边
+int dist[N];        // 存储每个点到1号点的最短距离
+int 
+bool st[N];     // 存储每个点是否在队列中
+
+// 求1号点到n号点的最短路距离，如果从1号点无法走到n号点则输出impossible
+int spfa()
+{
+    memset(dist, 0x3f, sizeof dist);
+    dist[1] = 0;
+
+    queue<int> q;
+    q.push(1);
+    st[1] = true;
+
+    while (q.size())
+    {
+        auto t = q.front();
+        q.pop();
+
+        st[t] = false;	//取出后取消标记
+
+        for (int i = h[t]; i != -1; i = ne[i])
+        {
+            int j = e[i];
+            if (dist[j] > dist[t] + w[i])
+            {
+                dist[j] = dist[t] + w[i];
+                if (!st[j])     // 如果队列中已存在j，则不需要将j重复插入
+                {
+                    q.push(j);
+                    st[j] = true;	//加入队列后，打上标记
+                }
+            }
+        }
+    }
+
+    
+   	// 这句留在 mian函数中判断更为保险 if (dist[n] == 0x3f3f3f3f) ....;
+    return dist[n];
+}
+
 ```
 
