@@ -275,7 +275,7 @@ int backup[N];   //定义备份数组
 
 复杂度:
 
-一般：O(m)  最坏: O(nm)
+一般情况：O(m)  最坏情况: O(nm)
 
 ```C++
 const int N = ...;  //依题意
@@ -326,45 +326,65 @@ const int N = ...;  //依题意
 int n;      // 总点数
 int h[N], w[N], e[N], ne[N], idx;       // 邻接表存储所有边
 int dist[N];        // 存储每个点到1号点的最短距离
-int 
+int cnt[N];		//cnt[x]存储1到x的最短路中经过的点数
 bool st[N];     // 存储每个点是否在队列中
 
 // 求1号点到n号点的最短路距离，如果从1号点无法走到n号点则输出impossible
-int spfa()
+bool spfa()
 {
-    memset(dist, 0x3f, sizeof dist);
-    dist[1] = 0;
+    // 不需要初始化dist数组
+    // 原理：如果某条最短路径上有n个点（除了自己），那么加上自己之后一共有n+1个点，由抽屉原理一定有两个点相同，所以存在环。
 
     queue<int> q;
-    q.push(1);
-    st[1] = true;
-
-    while (q.size())
+    
+    for(int i = 1; i <= n; i++)
+    {
+        status[i] = true;
+        q.push(i);
+    }
+    
+    while(q.size())
     {
         auto t = q.front();
         q.pop();
-
-        st[t] = false;	//取出后取消标记
-
-        for (int i = h[t]; i != -1; i = ne[i])
+        
+        status[t] = false;
+        
+        for(int i = head[t]; ~i; i = ne[i])
         {
             int j = e[i];
-            if (dist[j] > dist[t] + w[i])
+            if(dist[j] > dist[t] + w[i])
             {
                 dist[j] = dist[t] + w[i];
-                if (!st[j])     // 如果队列中已存在j，则不需要将j重复插入
+                cnt[j] = cnt[t] + 1; //更新为 当前点 的前驱点的路径点数 + 1即为到达当前点的路径点数
+                if(cnt[j] >= n) return true;
+                if(!status[j])
                 {
                     q.push(j);
-                    st[j] = true;	//加入队列后，打上标记
+                    status[j] = true;
                 }
             }
         }
     }
-
-    
-   	// 这句留在 mian函数中判断更为保险 if (dist[n] == 0x3f3f3f3f) ....;
-    return dist[n];
+    return false;
 }
 
 ```
 
+## Floyd 多源汇最短路
+
+思路：
+
+模板：
+
+```c++
+void floyd()
+{
+	for(int k = 1; k < =n; k++)
+    	for(int i = 1; i <= n; i++)
+        	for(int j = 1; j <= n; j++)
+            	dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+}
+```
+
+ 
