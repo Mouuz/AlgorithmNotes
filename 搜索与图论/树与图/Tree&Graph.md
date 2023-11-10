@@ -114,7 +114,7 @@ int main()
 
 
 
-## 树与图的DFS遍历  O(m+n)
+## 树与图的BFS遍历  O(m+n)
 
 ```C++
 queue<int> q;
