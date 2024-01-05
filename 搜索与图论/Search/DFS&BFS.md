@@ -260,4 +260,68 @@ int main()
     return 0;
 }
 ```
+### 示例3(多源BFS) 
+[逃离火灾](https://leetcode.cn/problems/escape-the-spreading-fire/)
+
+```
+class Solution {
+    const int dx[4]{0, 1, 0, -1}, dy[4]{1, 0, -1, 0};
+    using PII = pair<int, int>;
+
+public:
+    int maximumMinutes(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+
+        auto bfs = [&](vector<PII>& q) -> tuple<int, int, int> {
+            vector<vector<int>> time(m, vector<int>(n, -1));
+            queue<PII> que;
+            for (auto& cell : q) {
+                time[cell.first][cell.second] = 0;
+                que.push(cell);
+            }
+
+            while (que.size()) {
+                auto temp = que.front();
+                que.pop();
+
+                for (int i = 0; i < 4; i++) {
+                    int x = temp.first + dx[i], y = temp.second + dy[i];
+                    if (0 <= x && x < m && 0 <= y && y < n && grid[x][y] == 0 &&
+                        time[x][y] < 0) {
+                        time[x][y] = time[temp.first][temp.second] + 1;
+                        que.emplace(x, y);
+                    }
+                }
+            }
+
+            return {time[m - 1][n - 1], time[m - 1][n - 2], time[m - 2][n - 1]};
+        };
+
+        vector<PII> man = {{0, 0}};
+        auto [man_to_house_time, man_house_left, man_house_up] = bfs(man);
+        if (man_to_house_time < 0)
+            return -1;
+
+        vector<PII> fire;
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                if (grid[i][j] == 1)
+                    fire.emplace_back(i, j);
+
+        auto [fire_to_house_time, fire_house_left, fire_house_up] = bfs(fire);
+        if (fire_to_house_time < 0)
+            return 1e9;
+
+        int d = fire_to_house_time - man_to_house_time;
+        if (d < 0)
+            return -1;
+
+        if (man_house_left != -1 && man_house_left + d < fire_house_left ||
+            man_house_up != -1 && man_house_up + d < fire_house_up)
+            return d;
+
+        return d - 1;
+    }
+};
+```
 
