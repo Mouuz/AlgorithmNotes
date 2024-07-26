@@ -1,6 +1,6 @@
 
 
-<img src=".\最短路问题.png" alt="最短路问题"/>
+<img src="./最短路问题.png" alt="最短路问题"/>
 
 ## 朴素Dijkstra算法  主要用于稠密图
 
